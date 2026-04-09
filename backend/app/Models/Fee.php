@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Fee extends Model
+{
+    protected $fillable = ['class_id', 'fee_type', 'amount', 'frequency'];
+
+    public function schoolClass()
+    {
+        return $this->belongsTo(SchoolClass::class, 'class_id');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(FeePayment::class);
+    }
+}

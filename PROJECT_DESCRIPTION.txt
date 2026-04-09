@@ -1,0 +1,304 @@
+================================================================================
+                        SCHOOLMS - SCHOOL MANAGEMENT SYSTEM
+                           Project Definition & Flow Description
+================================================================================
+
+--------------------------------------------------------------------------------
+1. PROJECT OVERVIEW
+--------------------------------------------------------------------------------
+
+  Name        : SchoolMS - School Management System
+  Type        : Full-Stack Web Application
+  Purpose     : A comprehensive digital platform to manage the day-to-day
+                operations of a school including students, teachers, classes,
+                attendance, exams, fees, timetables, and communication.
+
+--------------------------------------------------------------------------------
+2. TECH STACK
+--------------------------------------------------------------------------------
+
+  BACKEND
+  -------
+  Framework   : Laravel 13 (PHP)
+  Auth        : Laravel Sanctum (Token-based Authentication)
+  Database    : MYSQL
+  API Type    : RESTful JSON API
+
+  FRONTEND
+  --------
+  Framework   : React (with Vite)
+  Styling     : Tailwind CSS
+  Routing     : React Router v6
+  HTTP Client : Axios
+  Notifications: React Hot Toast
+
+--------------------------------------------------------------------------------
+3. PROJECT STRUCTURE
+--------------------------------------------------------------------------------
+
+  schoolms/
+  |
+  |-- backend/                  Laravel API
+  |   |-- app/
+  |   |   |-- Http/
+  |   |   |   |-- Controllers/Api/    API Controllers
+  |   |   |   |-- Middleware/         Role Middleware
+  |   |   |-- Models/                 Eloquent Models
+  |   |-- database/
+  |   |   |-- migrations/             DB Schema
+  |   |   |-- seeders/                Sample Data
+  |   |-- routes/
+  |       |-- api.php                 All API Routes
+  |
+  |-- frontend/                 React Application
+      |-- src/
+          |-- components/       Reusable UI Components
+          |-- context/          Auth Context (Global State)
+          |-- pages/            Page Components
+          |-- routes/           Protected Route Logic
+          |-- services/         Axios API Service
+
+--------------------------------------------------------------------------------
+4. USER ROLES & PERMISSIONS
+--------------------------------------------------------------------------------
+
+  4.1  ADMIN
+  ----------
+  - Full access to all modules
+  - Manage Students (add, view, delete)
+  - Manage Teachers (add, view, delete)
+  - Manage Classes and Sections
+  - Manage Subjects
+  - Mark and view Attendance
+  - Create Exams and enter Marks
+  - Manage Fee Structures and Payment Records
+  - Post, edit, delete Notices
+  - Manage Timetables
+  - View Admin Dashboard with school-wide statistics
+
+  4.2  TEACHER
+  ------------
+  - View Students list
+  - Mark and manage Attendance
+  - Create and manage Exams
+  - Enter and manage student Marks
+  - View Timetable
+  - Read Notices
+  - View Teacher Dashboard
+
+  4.3  STUDENT
+  ------------
+  - View own Attendance history and summary
+  - View own Exam Marks and Grades
+  - View Class Timetable (auto-loaded for their class)
+  - Read Notices
+  - View Student Dashboard
+
+  4.4  PARENT
+  -----------
+  - View all linked Children profiles
+  - View each child's Attendance summary
+  - View each child's Exam Results and Grades
+  - Read Notices
+  - View Parent Dashboard
+
+--------------------------------------------------------------------------------
+5. APPLICATION FLOW
+--------------------------------------------------------------------------------
+
+  STEP 1 : Authentication
+  -----------------------
+  User visits the app  -->  Redirected to /login
+  Enters email & password  -->  POST /api/login
+  Server returns token + user object (with role)
+  Token stored in localStorage
+  User object stored in AuthContext (global state)
+
+  STEP 2 : Role Detection & Navigation
+  -------------------------------------
+  After login, role is read from user object
+  Sidebar renders role-specific navigation links:
+    - Admin   : Full menu (all modules)
+    - Teacher : Students, Attendance, Exams, Notices, Timetable
+    - Student : Attendance, My Marks, Notices, Timetable
+    - Parent  : My Children, Notices
+
+  STEP 3 : Route Protection
+  -------------------------
+  Every route is wrapped in <ProtectedRoute>
+  If user is not logged in  -->  Redirect to /login
+  If user lacks required role  -->  Redirect to /unauthorized
+
+  STEP 4 : API Request Flow
+  -------------------------
+  React Page Component
+    --> api.js (Axios instance with Bearer token header)
+      --> Laravel API Route (routes/api.php)
+        --> Role Middleware (checks user role)
+          --> Controller Method
+            --> Eloquent Model (Database Query)
+              --> JSON Response
+                --> React state update
+                  --> UI re-renders with new data
+
+  STEP 5 : Logout
+  ---------------
+  User clicks Sign Out
+  POST /api/logout (token invalidated on server)
+  localStorage cleared
+  Redirected to /login
+
+--------------------------------------------------------------------------------
+6. KEY MODULES & API ENDPOINTS
+--------------------------------------------------------------------------------
+
+  MODULE              ENDPOINT                    ROLES ALLOWED
+  -----------------------------------------------------------------------
+  Authentication      POST   /api/login            Public
+                      POST   /api/logout            Authenticated
+                      GET    /api/me                Authenticated
+
+  Students            GET    /api/students          Admin, Teacher
+                      POST   /api/students          Admin, Teacher
+                      DELETE /api/students/{id}     Admin, Teacher
+
+  Teachers            GET    /api/teachers          Admin, Teacher
+                      POST   /api/teachers          Admin, Teacher
+                      DELETE /api/teachers/{id}     Admin, Teacher
+
+  Classes             GET    /api/classes           Admin, Teacher
+                      POST   /api/classes           Admin, Teacher
+
+  Sections            GET    /api/sections          Admin, Teacher
+                      POST   /api/sections          Admin, Teacher
+
+  Subjects            GET    /api/subjects          Admin, Teacher
+                      POST   /api/subjects          Admin, Teacher
+                      DELETE /api/subjects/{id}     Admin, Teacher
+
+  Attendance          GET    /api/attendance        Admin, Teacher
+                      POST   /api/attendance        Admin, Teacher
+                      GET    /api/my-attendance     Student (own only)
+
+  Exams               GET    /api/exams             Admin, Teacher
+                      POST   /api/exams             Admin, Teacher
+                      DELETE /api/exams/{id}        Admin, Teacher
+
+  Marks               GET    /api/marks             Admin, Teacher
+                      POST   /api/marks             Admin, Teacher
+                      GET    /api/my-marks          Student (own only)
+
+  Fees                GET    /api/fees              Admin
+                      POST   /api/fees              Admin
+
+  Fee Payments        GET    /api/fee-payments      Admin
+                      POST   /api/fee-payments      Admin
+
+  Notices             GET    /api/notices           All Roles
+                      POST   /api/notices           Admin only
+
+  Timetable           GET    /api/timetables        Admin, Teacher
+                      POST   /api/timetables        Admin, Teacher
+                      GET    /api/my-timetable      Student (own class)
+
+  Dashboard           GET    /api/dashboard/admin   Admin
+                      GET    /api/dashboard/teacher Teacher
+                      GET    /api/dashboard/student Student
+                      GET    /api/dashboard/parent  Parent
+
+  My Children         GET    /api/my-children       Parent only
+
+  Report Card         GET    /api/report-card/{id}  Authenticated
+
+--------------------------------------------------------------------------------
+7. DATABASE MODELS & RELATIONSHIPS
+--------------------------------------------------------------------------------
+
+  User
+    - belongs to Role
+    - has one Student / Teacher / ParentProfile
+
+  Student
+    - belongs to User
+    - belongs to SchoolClass
+    - belongs to Section
+    - belongs to ParentProfile
+    - has many Attendance records
+    - has many Marks
+    - has many FeePayments
+
+  Teacher
+    - belongs to User
+    - has many ClassSubjects
+
+  SchoolClass
+    - has many Sections
+    - has many Students
+    - has many Subjects (through ClassSubjects)
+    - has many Timetables
+    - has many Exams
+
+  Exam
+    - belongs to SchoolClass
+    - has many Marks
+
+  Mark
+    - belongs to Student
+    - belongs to Exam
+    - belongs to Subject
+
+  Attendance
+    - belongs to Student
+    - belongs to SchoolClass
+
+  Fee
+    - belongs to SchoolClass
+    - has many FeePayments
+
+  FeePayment
+    - belongs to Student
+    - belongs to Fee
+
+  Notice
+    - belongs to User (author)
+
+  Timetable
+    - belongs to SchoolClass
+    - belongs to Section
+    - belongs to Subject
+    - belongs to Teacher
+
+  ParentProfile
+    - belongs to User
+    - has many Students (children)
+
+--------------------------------------------------------------------------------
+8. PAGINATION
+--------------------------------------------------------------------------------
+
+  All listing pages use server-side pagination (10 records per page).
+  The Pagination component displays page numbers with Previous/Next controls.
+  Row counters are calculated as: (currentPage - 1) * 10 + index + 1
+  This ensures correct sequential numbering across all pages.
+
+  Pages with pagination:
+    - Students       (10 per page)
+    - Teachers       (10 per page)
+    - Subjects       (10 per page)
+    - Exams          (10 per page)
+    - Fee Structures (10 per page)
+    - Fee Payments   (10 per page)
+
+--------------------------------------------------------------------------------
+9. SECURITY
+--------------------------------------------------------------------------------
+
+  - All API routes (except /login) require a valid Sanctum Bearer token
+  - Role-based middleware restricts access per endpoint
+  - Frontend ProtectedRoute component enforces role-based page access
+  - Tokens are stored in localStorage and sent via Authorization header
+  - Passwords are hashed using Laravel's bcrypt
+
+--------------------------------------------------------------------------------
+                              END OF DOCUMENT
+================================================================================
