@@ -19,27 +19,39 @@ class StudentSeeder extends Seeder
         $classes = SchoolClass::with('sections')->get();
         $parents = ParentProfile::all();
 
-        $firstNames = ['Liam','Emma','Noah','Olivia','William','Ava','James','Isabella','Oliver','Sophia',
-                       'Benjamin','Mia','Elijah','Charlotte','Lucas','Amelia','Mason','Harper','Logan','Evelyn',
-                       'Alexander','Abigail','Ethan','Emily','Daniel','Elizabeth','Jacob','Mila','Michael','Ella',
-                       'Henry','Avery','Jackson','Sofia','Sebastian','Camila','Aiden','Aria','Matthew','Scarlett'];
+        $maleNames = [
+            'Aarav','Vivaan','Aditya','Vihaan','Arjun','Sai','Reyansh','Ayaan','Krishna','Ishaan',
+            'Shaurya','Atharv','Advik','Pranav','Advait','Dhruv','Kabir','Ritvik','Aarush','Darsh',
+            'Parth','Nikhil','Rohan','Karan','Yash','Harsh','Kunal','Rahul','Varun','Tarun',
+        ];
 
-        $lastNames  = ['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Wilson','Moore',
-                       'Taylor','Anderson','Thomas','Jackson','White','Harris','Martin','Thompson','Young','Allen'];
+        $femaleNames = [
+            'Aadhya','Ananya','Pari','Anika','Navya','Angel','Diya','Saanvi','Myra','Sara',
+            'Priya','Riya','Sneha','Pooja','Kavya','Nisha','Tanvi','Shreya','Divya','Meera',
+            'Isha','Tara','Nandini','Swara','Avni','Khushi','Simran','Anjali','Neha','Komal',
+        ];
+
+        $lastNames = [
+            'Sharma','Verma','Patel','Singh','Kumar','Gupta','Joshi','Mehta','Shah','Yadav',
+            'Mishra','Tiwari','Pandey','Chauhan','Rajput','Nair','Iyer','Reddy','Rao','Pillai',
+        ];
 
         $bloodGroups = ['A+','A-','B+','B-','O+','O-','AB+','AB-'];
         $genders     = ['Male','Female'];
+        $cities      = ['Mumbai','Delhi','Ahmedabad','Pune','Jaipur','Surat','Lucknow','Nagpur','Indore','Bhopal'];
 
         $counter = 1;
 
         foreach ($classes as $class) {
             foreach ($class->sections as $section) {
-                // 5 students per section
                 for ($i = 0; $i < 5; $i++) {
-                    $firstName = $firstNames[array_rand($firstNames)];
-                    $lastName  = $lastNames[array_rand($lastNames)];
                     $gender    = $genders[array_rand($genders)];
+                    $firstName = $gender === 'Male'
+                        ? $maleNames[array_rand($maleNames)]
+                        : $femaleNames[array_rand($femaleNames)];
+                    $lastName  = $lastNames[array_rand($lastNames)];
                     $email     = strtolower($firstName . '.' . $lastName . $counter . '@student.school.com');
+                    $city      = $cities[array_rand($cities)];
 
                     $user = User::create([
                         'name'      => "$firstName $lastName",
@@ -47,7 +59,7 @@ class StudentSeeder extends Seeder
                         'password'  => Hash::make('password'),
                         'role_id'   => $roleId,
                         'is_active' => true,
-                        'phone'     => '555-' . str_pad($counter + 3000, 4, '0', STR_PAD_LEFT),
+                        'phone'     => '98' . str_pad($counter + 10000, 8, '0', STR_PAD_LEFT),
                     ]);
 
                     Student::create([
@@ -58,7 +70,7 @@ class StudentSeeder extends Seeder
                         'parent_id'        => $parents->random()->id,
                         'date_of_birth'    => now()->subYears(rand(6, 16))->subMonths(rand(0, 11))->toDateString(),
                         'gender'           => $gender,
-                        'address'          => rand(10, 999) . ' Elm Street, City',
+                        'address'          => rand(1, 99) . ', ' . ['Shanti Nagar','Gandhi Road','Nehru Colony','MG Road','Laxmi Nagar'][rand(0,4)] . ', ' . $city,
                         'admission_date'   => now()->subYears(rand(0, 3))->toDateString(),
                         'blood_group'      => $bloodGroups[array_rand($bloodGroups)],
                     ]);

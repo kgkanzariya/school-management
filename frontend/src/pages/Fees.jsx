@@ -159,7 +159,7 @@ export default function Fees() {
                   </td>
                   <td className="px-5 py-3 font-medium text-gray-800">{f.school_class?.name}</td>
                   <td className="px-5 py-3 text-gray-600">{f.fee_type}</td>
-                  <td className="px-5 py-3 font-bold text-indigo-600">${f.amount}</td>
+                  <td className="px-5 py-3 font-bold text-indigo-600">₹{f.amount}</td>
                   <td className="px-5 py-3">
                     <span className="capitalize px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
                       {f.frequency}
@@ -204,7 +204,7 @@ export default function Fees() {
               {payments.map(p => (
                 <tr key={p.id} className="hover:bg-indigo-50/30 transition-colors">
                   <td className="px-5 py-3 font-medium text-gray-800">{p.student?.user?.name}</td>
-                  <td className="px-5 py-3 font-bold text-indigo-600">${p.amount_paid}</td>
+                  <td className="px-5 py-3 font-bold text-indigo-600">₹{p.amount_paid}</td>
                   <td className="px-5 py-3 text-gray-500">{p.payment_date}</td>
                   <td className="px-5 py-3">
                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${

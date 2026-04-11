@@ -107,7 +107,7 @@ export default function Dashboard() {
           <StatCard label="Total Classes" value={data.total_classes} icon="🏫"
             gradient="bg-gradient-to-br from-sky-500 to-sky-700"
             change="Across all grades" />
-          <StatCard label="Fee Collected" value={`$${Number(data.fee_collected_this_month).toLocaleString()}`} icon="💰"
+          <StatCard label="Fee Collected" value={`₹${Number(data.fee_collected_this_month).toLocaleString('en-IN')}`} icon="💰"
             gradient="bg-gradient-to-br from-emerald-500 to-emerald-700"
             change="This month" />
         </div>
